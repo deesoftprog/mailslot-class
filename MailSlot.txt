@@ -1,0 +1,114 @@
+!************************* SERVER **************************
+s  program
+!*********************
+! dee2018-12-01  
+! Класс приема и передачи майслотов
+!*********************
+
+   map
+   end
+   
+   include('MailSlot.inc'),once
+
+MSL class(MailSlot)
+ReceiveGetItem Procedure(),VIRTUAL
+    end  
+ 
+Window WINDOW('Прием '),AT(,,156,176),GRAY,FONT('Microsoft Sans Serif',8)
+    BUTTON('Выход'),AT(54,143,42,14),USE(?Cancel_Button),FONT(,8,, |
+        FONT:regular+FONT:italic)
+  END
+
+BUF string(512)
+
+  code
+
+  if MSL.ReceiveInit('sample_mailslot',3123123)
+     stop('err INIT')
+  end  
+  
+  open(Window)
+  
+  Window{PROP:Timer} = 20  
+  ACCEPT
+     case EVENT()
+     of EVENT:Timer
+        cc# = MSL.ReceiveQuery()
+     of EVENT:OpenWindow
+     of EVENT:CloseWindow
+     of EVENT:Accepted
+        case FIELD()
+        of ?Cancel_Button
+           post(EVENT:CloseWindow)
+        end
+     end
+  end
+  close(Window)
+
+  MSL.ReceiveClose()
+
+
+MSL.ReceiveGetItem PROCEDURE
+  code
+  BUF = clip(self.S) 
+  stop(BUF)
+  RETURN
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+!************************* CLIENT **************************
+s  program
+!*********************
+! dee2018-12-01  
+! Класс приема и передачи майслотов
+!*********************
+
+   map
+   end
+   
+   include('MailSlot.inc'),once
+
+MSL class(MailSlot)
+    end  
+ 
+Window WINDOW('Прием '),AT(,,156,176),GRAY,FONT('Microsoft Sans Serif',8)
+    BUTTON('Выход'),AT(54,143,42,14),USE(?Cancel_Button),FONT(,8,, |
+        FONT:regular+FONT:italic)
+    BUTTON('Передать'),AT(54,29,42,14),USE(?Send),FONT(,8,,FONT:regular+FONT:italic)
+  END
+
+BUF string(512)
+
+  code
+  
+  if MSL.SendInit('sample_mailslot')
+     stop('err INIT')
+  end
+  
+  open(Window)
+  
+  ACCEPT
+     case EVENT()
+     of EVENT:Timer
+     of EVENT:OpenWindow
+     of EVENT:CloseWindow
+     of EVENT:Accepted
+        case FIELD()
+        of ?Cancel_Button
+           post(EVENT:CloseWindow)
+        of ?Send
+           stop(  MSL.SendMess('erwer5678 wer wer we rwer we')  )
+        end
+     end
+  end
+  close(Window)
+
+  MSL.SendClose()
+
